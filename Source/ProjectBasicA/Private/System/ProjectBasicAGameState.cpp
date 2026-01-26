@@ -5,13 +5,15 @@
 
 void AProjectBasicAGameState::BeginPlay()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	Super::BeginPlay();
 }
 
 void AProjectBasicAGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	Super::EndPlay(EndPlayReason);
 }
 
 void AProjectBasicAGameState::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 }

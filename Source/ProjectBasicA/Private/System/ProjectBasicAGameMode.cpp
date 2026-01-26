@@ -10,9 +10,6 @@
 
 AProjectBasicAGameMode::AProjectBasicAGameMode()
 {
-	// use our custom PlayerController class
-	PlayerControllerClass = AProjectBasicAPlayerController::StaticClass();
-
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> FindPlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
 	if (FindPlayerPawnBPClass.Class != nullptr)

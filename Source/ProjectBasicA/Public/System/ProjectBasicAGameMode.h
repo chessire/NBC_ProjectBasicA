@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "ProjectBasicAGameMode.generated.h"
 
 // TODO_GEUKMIN EXAM : TSharedPtr, TSharedRef ¿¹½Ã
@@ -25,7 +25,7 @@ class APlayerState;
 class AHUD;
 
 UCLASS(minimalapi)
-class AProjectBasicAGameMode : public AGameModeBase
+class AProjectBasicAGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
