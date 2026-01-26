@@ -12,6 +12,7 @@ struct FHelloWorld
 {
 	GENERATED_BODY()
 
+	FHelloWorld() : Hello(0) {}
 	FHelloWorld(int InHello) : Hello(InHello) {}
 	int Hello;
 };
