@@ -20,12 +20,26 @@ AProjectBasicAPlayerController::AProjectBasicAPlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 	CachedDestination = FVector::ZeroVector;
 	FollowTime = 0.f;
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AProjectBasicAPlayerController::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void AProjectBasicAPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (WasInputKeyJustReleased(EKeys::Delete))
+	{
+		APawn* TempPawn = GetPawn();
+		if(TempPawn != nullptr)
+			TempPawn->Destroy();
+	}
 }
 
 void AProjectBasicAPlayerController::SetupInputComponent()
@@ -93,8 +107,9 @@ void AProjectBasicAPlayerController::OnSetDestinationTriggered()
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn != nullptr)
 	{
-		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		FVector ActorLocation = ControlledPawn->GetActorLocation();
+		FVector WorldDirection = (CachedDestination - ActorLocation).GetSafeNormal();
+		ControlledPawn->AddMovementInput(WorldDirection, 1.0, true);
 	}
 }
 

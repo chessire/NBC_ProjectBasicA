@@ -50,6 +50,7 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+	virtual void Tick(float DeltaTime);
 
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();

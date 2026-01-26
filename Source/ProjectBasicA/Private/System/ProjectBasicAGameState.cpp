@@ -5,6 +5,7 @@
 
 void AProjectBasicAGameState::BeginPlay()
 {
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AProjectBasicAGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -31,9 +31,16 @@ AProjectBasicACharacter::AProjectBasicACharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+
+	// TODO_GEUKMIN EXAM : IsA
+	if (CameraBoom.IsA<USpringArmComponent>())
+	{
+		auto* CameraBoomInst = Cast<USpringArmComponent>(CameraBoom);
+		CameraBoomInst->TargetArmLength = 800.f;
+		CameraBoomInst->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	}
+	// TODO_GEUKMIN EXAM : IsA End
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -48,4 +55,17 @@ AProjectBasicACharacter::AProjectBasicACharacter()
 void AProjectBasicACharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+	// TODO_GEUKMIN EXAM : IsNull
+	if(CameraBoom.IsNull()) // if(CameraBoom == nullptr)
+		return;
+	// TODO_GEUKMIN EXAM : IsNull End
+}
+
+TObjectPtr<class USpringArmComponent> AProjectBasicACharacter::GetCameraBoom() const
+{
+	if (CameraBoom.IsA<USpringArmComponent>())
+		return Cast<USpringArmComponent>(CameraBoom);
+
+	return nullptr;
 }

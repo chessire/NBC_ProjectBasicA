@@ -48,9 +48,9 @@ AProjectBasicAGameMode::AProjectBasicAGameMode()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AProjectBasicAGameMode::BeginPlay()
+void AProjectBasicAGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	Super::BeginPlay();
+	Super::InitGame(MapName, Options, ErrorMessage);
 	if (PlayerPawnBPClass != nullptr)
 	{
 		DefaultPawnClass = PlayerPawnBPClass;
@@ -83,9 +83,70 @@ void AProjectBasicAGameMode::BeginPlay()
 	}
 }
 
+void AProjectBasicAGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!PlayerController)
+		return;
+
+	Pawn = PlayerController->GetPawn();
+	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable 예시
+	HelloPtr = MakeShared<FHelloWorld>(100);
+	HelloPtrShareable = MakeShareable<FHelloWorld>(new FHelloWorld(100));
+	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable 예시 end
+}
+
+void AProjectBasicAGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+// TODO_GEUKMIN EXAM : TSharedRef 예시
+void InitHelloWorld(TSharedRef<FHelloWorld> A)
+{
+	A->Hello = 100;
+}
+// TODO_GEUKMIN EXAM : TSharedRef 예시 end
+
+// TODO_GEUKMIN EXAM : TWeakPtr 예시
+void UseHelloWorld(TWeakPtr<FHelloWorld> A)
+{
+	//if(A.IsValid() == false) // IsValid가 false일 때, pin할 경우 nullptr
+	//	return;
+
+	TSharedPtr<FHelloWorld> PinnedA = A.Pin();
+	if(PinnedA == nullptr && PinnedA->Hello > 0)
+		PinnedA->Hello -= 1;
+}
+// TODO_GEUKMIN EXAM : TWeakPtr 예시 end
+
 void AProjectBasicAGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// TODO_GEUKMIN EXAM : IsValid 예시
+	// TODO_GEUKMIN DESC : Dangling 설명
+	// 1. PlayerController에 Pawn이 있음
+	// 2. GameModeBase에서 Pawn을 PlayerController로부터 가져옴
+	// 3. PlayerController에서 Pawn을 지움
+	// 4. GameModeBase의 Pawn은 nullptr가 아님
+	// 5. 우리는 이걸 Dangling 이라고 표현하기로 했어요~
+	if (Pawn.IsValid() == false)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Removed Pawn."));
+	}
+	// TODO_GEUKMIN DESC : Dangling 설명 end
+	// TODO_GEUKMIN EXAM : IsValid 예시 end
+
+	// TODO_GEUKMIN EXAM : TSharedPtr, TSharedRef 예시
+	TSharedRef<FHelloWorld> HelloRef = HelloPtr.ToSharedRef();
+	TSharedPtr<FHelloWorld> HelloPtr2 = HelloRef.ToSharedPtr();
+
+	if(HelloPtr != nullptr)
+		InitHelloWorld(HelloPtr.ToSharedRef());
+	// TODO_GEUKMIN EXAM : TSharedPtr, TSharedRef 예시 end
 }
 
 void AProjectBasicAGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
