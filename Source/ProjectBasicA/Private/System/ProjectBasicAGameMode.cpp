@@ -89,10 +89,20 @@ void AProjectBasicAGameMode::StartPlay()
 		return;
 
 	Pawn = PlayerController->GetPawn();
-	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable 예시
+	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable, MakeUnique 예시
 	HelloPtr = MakeShared<FHelloWorld>(100);
 	HelloPtrShareable = MakeShareable<FHelloWorld>(new FHelloWorld(100));
-	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable 예시 end
+	HelloUnique = MakeUnique<FHelloWorld>(1000);
+	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable, MakeUnique 예시 end
+
+	// TODO_GEUKMIN EXAM : TUniquePtr 예시
+	//MoveTemp(HelloUnique);
+	//TUniquePtr<FHelloWorld>&& InUniquePtr = MoveTemp(HelloUnique);
+	//TUniquePtr<FHelloWorld> InUniquePtr2 = MoveTemp(HelloUnique);
+
+	HandleUnique1(MoveTemp(HelloUnique));
+	HandleUnique2(MoveTemp(HelloUnique), HelloUnique, &HelloUnique);
+	// TODO_GEUKMIN EXAM : TUniquePtr 예시 End
 }
 
 void AProjectBasicAGameMode::BeginPlay()
