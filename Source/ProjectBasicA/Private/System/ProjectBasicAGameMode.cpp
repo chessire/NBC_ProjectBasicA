@@ -8,9 +8,24 @@
 #include "System/ProjectAGameInstance.h"
 #include "Pawn/ProjectBasicACharacter.h"
 
+void UHelloWorld1::FunctionA()
+{
+	UE_LOG(LogTemp, Error, TEXT("Hello FunctionA"));
+}
+
+void UHelloWorld1::FunctionB()
+{
+}
+
+void UHelloWorld1::FunctionC()
+{
+}
+
+
 AProjectBasicAGameMode::AProjectBasicAGameMode()
 {
 	// set default pawn class to our Blueprinted character
+	APawn::StaticClass();
 	static ConstructorHelpers::FClassFinder<APawn> FindPlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
 	if (FindPlayerPawnBPClass.Class != nullptr)
 	{
@@ -88,6 +103,8 @@ void AProjectBasicAGameMode::StartPlay()
 	if (!PlayerController)
 		return;
 
+	FunctionA();
+
 	Pawn = PlayerController->GetPawn();
 	// TODO_GEUKMIN EXAM : MakeShared, MakeShareable, MakeUnique ¿¹½Ã
 	HelloPtr = MakeShared<FHelloWorld>(100);
@@ -159,4 +176,28 @@ void AProjectBasicAGameMode::Tick(float DeltaSeconds)
 void AProjectBasicAGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void AProjectBasicAGameMode::FunctionA()
+{
+	//UObject* Object = this;
+	//UFunction* StartPlayFunction = Object->StaticClass()->FindFunctionByName(TEXT("FunctionA"));
+	//if (StartPlayFunction->IsNative())
+	//{
+	//	FFrame Stack(Object, StartPlayFunction, nullptr, nullptr, StartPlayFunction->ChildProperties);
+
+	//	HelloWorld = NewObject<UHelloWorld1>(this);
+	//	UObject* Ptr = HelloWorld;
+	//	UClass* HelloWorldClass = HelloWorld->GetClass();
+	//	UFunction* Function = HelloWorldClass->FindFunctionByName(TEXT("FunctionA"));
+	//	Function->Invoke(Ptr, Stack, nullptr);
+	//}
+}
+
+void AProjectBasicAGameMode::FunctionB()
+{
+}
+
+void AProjectBasicAGameMode::FunctionC()
+{
 }
