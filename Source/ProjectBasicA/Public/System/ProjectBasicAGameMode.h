@@ -6,6 +6,27 @@
 #include "GameFramework/GameMode.h"
 #include "ProjectBasicAGameMode.generated.h"
 
+UCLASS()
+class UHelloWorld1 : public UObject
+{
+	GENERATED_BODY()
+public:
+	UFUNCTION()
+	void FunctionA();
+	UFUNCTION()
+	void FunctionB();
+	UFUNCTION()
+	void FunctionC();
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool Hi;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	double Hello;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int Annyong;
+
+};
+
 // TODO_GEUKMIN EXAM : TSharedPtr, TSharedRef 예시
 USTRUCT()
 struct FHelloWorld
@@ -38,6 +59,13 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	UFUNCTION()
+	void FunctionA();
+	UFUNCTION()
+	void FunctionB();
+	UFUNCTION()
+	void FunctionC();
+
 	// TODO_GEUKMIN EXAM : 잘못 사용된 UniquePtr 예시
 	//TUniquePtr<FHelloWorld>& GetUnique() { return HelloUnique; }
 	//TUniquePtr<FHelloWorld>* GetUnique() { return HelloUnique; }
@@ -63,7 +91,7 @@ public:
 	}
 	void HandleUnique2(TUniquePtr<FHelloWorld>&& InUniquePtr, TUniquePtr<FHelloWorld>& InUniquePtr2, TUniquePtr<FHelloWorld>* InUniquePtr3)
 	{
-		UE_LOG(LogTemp, Error, TEXT("HelloWorld %d"), InUniquePtr->Hello);
+		//UE_LOG(LogTemp, Error, TEXT("HelloWorld %d"), InUniquePtr->Hello);
 	}
 	void HandleUnique3(TUniquePtr<FHelloWorld>&& InUniquePtr)
 	{
@@ -84,8 +112,8 @@ private:
 	TSubclassOf<AGameState> GameStateBPClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<APlayerState> PlayerStateBPClass;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AHUD> HudBPClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))	TSubclassOf<AHUD> HudBPClass;
+	TObjectPtr<UHelloWorld1> HelloWorld;
 
 	TWeakObjectPtr<APawn> Pawn;
 	TSoftObjectPtr<APawn> PawnB;
