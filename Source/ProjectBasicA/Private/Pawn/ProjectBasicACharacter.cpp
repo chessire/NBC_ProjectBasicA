@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Pawn/ProjectBasicACharacter.h"
+
+#include "EnhancedInputComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -10,6 +12,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+
+DEFINE_LOG_CATEGORY(LogBasicACharacter);
 
 AProjectBasicACharacter::AProjectBasicACharacter()
 {
@@ -52,14 +56,36 @@ AProjectBasicACharacter::AProjectBasicACharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+void AProjectBasicACharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow,
+		FString::Printf(TEXT("[AProjectBasicACharacter::BeginPlay]"))
+	);
+}
+
+void AProjectBasicACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		// Setup mouse input events
+		EnhancedInputComponent->BindAction(CommonMoveAction, ETriggerEvent::Triggered, this, &AProjectBasicACharacter::OnCommonMove);
+	}
+	else
+	{
+		UE_LOG(LogBasicACharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
 void AProjectBasicACharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	// TODO_GEUKMIN EXAM : IsNull
-	if(CameraBoom.IsNull()) // if(CameraBoom == nullptr)
-		return;
-	// TODO_GEUKMIN EXAM : IsNull End
+	// GetWorld()->LineTraceSingle
+	// GetWorld()->SweepSingle
+	// DrawDebugLine()
+	// DrawDebugCircle()
 }
 
 TObjectPtr<class USpringArmComponent> AProjectBasicACharacter::GetCameraBoom() const
@@ -68,4 +94,14 @@ TObjectPtr<class USpringArmComponent> AProjectBasicACharacter::GetCameraBoom() c
 		return Cast<USpringArmComponent>(CameraBoom);
 
 	return nullptr;
+}
+
+void AProjectBasicACharacter::OnCommonMove(const FInputActionValue& value)
+{
+	FVector2D Axis = value.Get<FVector2D>();
+	FVector InputVector(Axis.X, Axis.Y, 0.f);
+	InputVector.Normalize();
+	GetMovementComponent()->AddInputVector(
+		InputVector * Speed
+	);
 }

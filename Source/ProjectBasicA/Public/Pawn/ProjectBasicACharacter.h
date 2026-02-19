@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ProjectBasicACharacter.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogBasicACharacter, Log, All);
+
 UCLASS(Blueprintable)
 class AProjectBasicACharacter : public ACharacter
 {
@@ -13,6 +15,9 @@ class AProjectBasicACharacter : public ACharacter
 
 public:
 	AProjectBasicACharacter();
+
+	virtual void BeginPlay() override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -22,6 +27,9 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE TObjectPtr<class USpringArmComponent> GetCameraBoom() const;
 
+protected:
+	virtual void OnCommonMove(const struct FInputActionValue& value);
+
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -30,10 +38,17 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USceneComponent> CameraBoom;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* CommonMoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess = "true"))
+	float Speed;
 };
 
 
-// TODO_GEUKMIN DESC : RTTI¿¡ ´ëÇÑ ¼³¸í
+// TODO_GEUKMIN DESC : RTTIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 //enum class EItemType
 //{
 //	Healing,
@@ -61,7 +76,7 @@ private:
 //};
 //
 //// upcasting
-//Item* item = new ManaPotion(); // ¹®Á¦ ¾øÀ½
+//Item* item = new ManaPotion(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 //
 //// downcasting
 //HealingPotion* healing = (HealingPotion*)item;
@@ -69,11 +84,12 @@ private:
 //// crash~
 //healing->Heal();
 
-// dynamic_cast : ´Ù¿îÄ³½ºÆÃ ½ÇÆÐ½Ã nullptr, ´Ù¿îÄ³½ºÆÃ ¼º°ø½Ã ¿Ã¹Ù¸¥ °ª
+// dynamic_cast : ï¿½Ù¿ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ð½ï¿½ nullptr, ï¿½Ù¿ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¹Ù¸ï¿½ ï¿½ï¿½
 // ?
-// dynamic_cast ¾²¸é µÇ°Ú³×~
-// RTTI¶ó´Â ¾î¸¶¹«½ÃÇÑ Ä£±¸¸¦ °Çµå¸³´Ï´Ù.
+// dynamic_cast ï¿½ï¿½ï¿½ï¿½ ï¿½Ç°Ú³ï¿½~
+// RTTIï¿½ï¿½ï¿½ ï¿½î¸¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä£ï¿½ï¿½ï¿½ï¿½ ï¿½Çµå¸³ï¿½Ï´ï¿½.
 // RunTime Type Identifier
-// ¾î¸¶¹«½ÃÇÏ°Ô ´À·ÁÁý´Ï´Ù.
+// ï¿½î¸¶ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
 // 
-// TODO_GEUKMIN DESC : RTTI¿¡ ´ëÇÑ ¼³¸í End
+// TODO_GEUKMIN DESC : RTTIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ End
+
