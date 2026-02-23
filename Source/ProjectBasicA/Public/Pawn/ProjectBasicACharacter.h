@@ -29,6 +29,10 @@ public:
 
 protected:
 	virtual void OnCommonMove(const struct FInputActionValue& value);
+	virtual void OnAttack();
+	virtual void OnDashTriggered();
+	virtual void OnDashCanceled();
+	FVector GetFireFrontVector();
 
 private:
 	/** Top down camera */
@@ -39,12 +43,30 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USceneComponent> CameraBoom;
 
-	/** Jump Input Action */
+	
+	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* CommonMoveAction;
+	
+	/** Attack Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* AttackAction;
+	
+	/** Dash Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* DashAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess = "true"))
 	float Speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess = "true"))
+	float FireDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess = "true"))
+	float DashDistance;
+
+	bool bDashMode;
+	FTimerHandle DashTimerHandle;
 };
 
 
@@ -92,4 +114,3 @@ private:
 // ������ϰ� �������ϴ�.
 // 
 // TODO_GEUKMIN DESC : RTTI�� ���� ���� End
-

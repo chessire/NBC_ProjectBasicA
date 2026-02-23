@@ -5,7 +5,6 @@
 #include "EnhancedInputComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
-#include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -71,6 +70,10 @@ void AProjectBasicACharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	{
 		// Setup mouse input events
 		EnhancedInputComponent->BindAction(CommonMoveAction, ETriggerEvent::Triggered, this, &AProjectBasicACharacter::OnCommonMove);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AProjectBasicACharacter::OnAttack);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &AProjectBasicACharacter::OnDashTriggered);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &AProjectBasicACharacter::OnDashCanceled);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Canceled, this, &AProjectBasicACharacter::OnDashCanceled);
 	}
 	else
 	{
@@ -101,7 +104,93 @@ void AProjectBasicACharacter::OnCommonMove(const FInputActionValue& value)
 	FVector2D Axis = value.Get<FVector2D>();
 	FVector InputVector(Axis.X, Axis.Y, 0.f);
 	InputVector.Normalize();
-	GetMovementComponent()->AddInputVector(
-		InputVector * Speed
-	);
+	if (bDashMode)
+	{
+		const FVector& ActorLocation = GetActorLocation();
+		const FQuat& ActorQuat = GetActorQuat();
+		FVector SweepTraceEnd = ActorLocation + InputVector * DashDistance;
+		const FCollisionShape& Shape = GetCapsuleComponent()->GetCollisionShape();
+		FHitResult Hit;
+		if (GetWorld()->SweepSingleByChannel(
+			Hit,
+			ActorLocation,
+			SweepTraceEnd,
+			ActorQuat,
+			ECC_Visibility,
+			Shape
+		))
+		{
+			DrawDebugSphere(GetWorld(), Hit.Location, 20.f, 16, FColor::Red);
+			bDashMode = false;
+		}
+	}
+	else
+	{
+		GetMovementComponent()->AddInputVector(
+			InputVector * Speed
+		);
+	}
+}
+
+FVector AProjectBasicACharacter::GetFireFrontVector() {
+	FQuat Quat = GetMesh()->GetSocketQuaternion(TEXT("fire_point_socket"));
+	float x = Quat.X;
+	float y = Quat.Y;
+	float z = Quat.Z;
+	float w = Quat.W;
+
+	float vx = 2 * (x * z + w * y);
+	float vy = 2 * (y * z - w * x);
+	float vz = 1 - 2 * (x * x + y * y);
+
+	return FVector(vx, vy, vz);
+}
+
+void AProjectBasicACharacter::OnAttack()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC == nullptr)
+		return;
+		
+	float MouseX, MouseY;
+	if (PC->GetMousePosition(MouseX, MouseY) == false)
+		return;
+	
+	FHitResult HitResult;
+	if (PC->GetHitResultUnderCursor(ECC_GameTraceChannel2, false, HitResult) == false)
+		return;
+	
+	FVector CursorHitLocation = HitResult.Location;
+	DrawDebugCircle(GetWorld(), CursorHitLocation, 16.f, 16, FColor::Green);
+	
+	FVector FirePoint = GetMesh()->GetSocketLocation(TEXT("fire_point_socket"));
+	FVector FireNorm = CursorHitLocation - FirePoint;
+	FireNorm.Normalize();
+	FVector FireEndPoint = FirePoint + FireNorm * FireDistance;
+	FHitResult Hit;
+	if (GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		FirePoint,
+		FireEndPoint,
+		ECC_Visibility
+	))
+	{
+		DrawDebugLine(GetWorld(), FirePoint, Hit.Location, FColor(0, 255, 0));	
+	}
+}
+
+void AProjectBasicACharacter::OnDashTriggered()
+{
+	bDashMode = true;
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.SetTimer(DashTimerHandle, FTimerDelegate::CreateLambda([this]()
+	{
+		bDashMode = false;
+	}), 0.2f, false);
+}
+
+void AProjectBasicACharacter::OnDashCanceled()
+{
+	bDashMode = false;
 }
